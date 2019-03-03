@@ -1,4 +1,4 @@
-# hack-room-sharing
+# refactor-room-sharing
 
 ## Project setup
 ```
