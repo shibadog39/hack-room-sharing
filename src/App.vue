@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-toolbar app>
+    <v-toolbar app class="primary">
       <v-toolbar-title class="headline text-uppercase">
         <span>Vuetify</span>
         <span class="font-weight-light">MATERIAL DESIGN</span>
@@ -12,6 +12,7 @@
     </v-toolbar>
 
     <v-content>
+      <Payment/>
       <HelloWorld/>
     </v-content>
   </v-app>
@@ -20,10 +21,12 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import HelloWorld from './components/HelloWorld.vue';
+import Payment from './components/Payment.vue';
 
 @Component({
   components: {
     HelloWorld,
+    Payment,
   },
 })
 export default class App extends Vue {}
