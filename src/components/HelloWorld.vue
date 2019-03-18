@@ -15,6 +15,7 @@
           <br>please join our online
           <a href="https://community.vuetifyjs.com" target="_blank">Discord Community</a>
         </p>
+         <v-btn flat small>Normal</v-btn>
       </v-flex>
 
       <v-flex mb-5 xs12>
