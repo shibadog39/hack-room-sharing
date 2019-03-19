@@ -13,7 +13,6 @@
 
     <v-content>
       <Payment/>
-      <HelloWorld/>
     </v-content>
   </v-app>
 </template>
