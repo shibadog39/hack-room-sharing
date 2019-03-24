@@ -5,7 +5,6 @@
       <table>
         <thead>
           <tr>
-            <th>id</th>
             <th>日付</th>
             <th>モノ・コト</th>
             <th>人</th>
@@ -27,7 +26,7 @@
     <v-form>
         <v-layout row wrap>
           <v-flex xs4 sm4 md4>
-            <v-select :items="userList.map(user => user.name)" label="人"></v-select>
+            <v-select v-model="newItem.user" :items="userList" item-text="name" return-object label="人"></v-select>
           </v-flex>
           <v-flex xs4 sm4 md4>
              <v-text-field label="モノ・コト" type="text" placeholder="ティッシュ" v-model="newItem.name"></v-text-field>
