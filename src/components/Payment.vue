@@ -23,16 +23,16 @@
         </tbody>
       </table>
     </div>
-    <v-form>
+    <v-form  ref="form" lazy-validation>
         <v-layout row wrap>
           <v-flex xs4 sm4 md4>
             <v-select v-model="newItem.user" :items="userList" item-text="name" return-object label="人"></v-select>
           </v-flex>
           <v-flex xs4 sm4 md4>
-             <v-text-field label="モノ・コト" type="text" placeholder="ティッシュ" v-model="newItem.name"></v-text-field>
+             <v-text-field label="モノ・コト" type="text" placeholder="ティッシュ" v-model="newItem.name" :rules="[rules.required]"></v-text-field>
           </v-flex>
           <v-flex xs4 sm4 md4>
-            <v-text-field label="値段" type="number" placeholder="216" v-model="newItem.price"></v-text-field>
+            <v-text-field label="値段" type="number" placeholder="216" v-model="newItem.price" :rules="[rules.required]"></v-text-field>
           </v-flex>
           <v-btn small color="info" @click.prevent="addItem">add</v-btn>
         </v-layout>
@@ -74,18 +74,20 @@
       price: 0,
       date: new Date(),
     };
+    private  rules: any =  {
+          required: (value: any) => !!value || '入力必須です.'
+    }
 
     /**
      * addItem
      */
     public addItem() {
-      this.newItem.id = this.itemList.length + 1;
-      const newItem = Object.assign({}, this.newItem);
-      this.itemList.push(newItem);
-      this.newItem.id = 0;
-      this.newItem.name = '';
-      this.newItem.price = 0;
-      this.newItem.date = new Date();
+      if(this.validate()){
+        this.newItem.id = this.itemList.length + 1;
+        const newItem = Object.assign({}, this.newItem);
+        this.itemList.push(newItem);
+        (this.$refs.form as any).reset()
+      }
     }
 
     /**
@@ -96,6 +98,11 @@
         this.itemList.splice(index, 1);
       }
     }
+
+    private validate(): boolean {
+      // TODO: remove any
+      return (this.$refs.form as any).validate();
+      }
   }
 </script>
 
