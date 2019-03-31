@@ -16,7 +16,7 @@
         </thead>
         <tbody>
           <tr v-for="(item, index) in yetItems" :key="index">
-            <td>{{item.date | formatDate}}</td>
+            <td>{{item.date}}</td>
             <td>{{item.name}}</td>
             <td>{{getUserById(item.userId).name}}</td>
             <td>{{item.price}}</td>
@@ -85,7 +85,7 @@
             </tr>
           </tbody>
         </table>
-        <v-btn flat small color="success" @click.prevent="settleUpAll">精算した！</v-btn>
+        <v-btn flat small color="success" @click.prevent="settleUpAll">全部精算した！</v-btn>
       </template>
       <template v-else>
         <span>貸し借りなしだよパーフェクト！</span>
@@ -105,7 +105,7 @@
         </thead>
         <tbody>
           <tr v-for="(item, index) in completedItems" :key="index">
-            <td>{{item.date | formatDate}}</td>
+            <td>{{item.date}}</td>
             <td>{{item.name}}</td>
             <td>{{getUserById(item.userId).name}}</td>
             <td>{{item.price}}</td>
@@ -123,15 +123,13 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component, Watch } from "vue-property-decorator";
+import Storage from "../util/Storage";
+
+const storage = new Storage();
 
 @Component({
   filters: {
-    formatDate: (date: Date) => {
-      const m = ("00" + (date.getMonth() + 1)).slice(-2);
-      const d = ("00" + date.getDate()).slice(-2);
-      return m + "/" + d;
-    },
     formatMustPay: (mustPay: number) => {
       if (mustPay >= 0) {
         return mustPay + "円支払う";
@@ -152,31 +150,27 @@ export default class Payment extends Vue {
       name: "尾花"
     }
   ];
-  private yetItems: any[] = [
-    {
-      name: "家賃",
-      userId: this.userList[0].id,
-      price: 100,
-      date: new Date(2019, 0, 1)
-    }
-  ];
+  private yetItems: any[] = storage.getData("yetItems") || [];
   private newItem: any = {
     name: "",
     userId: this.userList[0].id,
     price: 0,
-    date: new Date()
+    date: this.formatDate(new Date())
   };
-  private completedItems: any[] = [
-    {
-      name: "自転車",
-      userId: this.userList[0].id,
-      price: 500,
-      date: new Date(2019, 0, 1)
-    }
-  ];
+  private completedItems: any[] = storage.getData("completedItems") || [];
   private rules: any = {
     required: (value: any) => !!value || "入力必須です."
   };
+
+  @Watch("yetItems", { immediate: true, deep: true })
+  onYetItemsChanged(list: any) {
+    storage.setData("yetItems", list);
+  }
+
+  @Watch("completedItems", { immediate: true, deep: true })
+  onCompletedItemsChanged(list: any) {
+    storage.setData("completedItems", list);
+  }
 
   /**
    * addItem
@@ -226,6 +220,11 @@ export default class Payment extends Vue {
     return itemList.map(item => {
       return item.price;
     });
+  }
+  private formatDate(date: Date): string {
+    const m = ("00" + (date.getMonth() + 1)).slice(-2);
+    const d = ("00" + date.getDate()).slice(-2);
+    return m + "/" + d;
   }
 
   private get totalAmount(): number {
