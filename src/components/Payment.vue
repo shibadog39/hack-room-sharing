@@ -1,7 +1,8 @@
 <template>
   <v-container>
-    <h1 class="display-2 font-weight-bold mb-3">○月決算</h1>
+    <h1 class="display-2 font-weight-bold mb-3">永谷マンション901号室(グループ名)</h1>
     <div>
+      <h3>払っといたよの記録</h3>
       <table>
         <thead>
           <tr>
@@ -10,21 +11,25 @@
             <th>人</th>
             <th>値段</th>
             <th></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in itemList" :key="index">
+          <tr v-for="(item, index) in yetItems" :key="index">
             <td>{{item.date | formatDate}}</td>
             <td>{{item.name}}</td>
             <td>{{getUserById(item.userId).name}}</td>
             <td>{{item.price}}</td>
             <td>
-              <v-btn flat small color="error" @click.prevent="deleteItem(index)">☓</v-btn>
+              <v-btn flat small color="success" @click.prevent="settleUp(index)">個別に精算した！</v-btn>
+            </td>
+            <td>
+              <v-btn flat small color="error" @click.prevent="deleteItem(index)">削除</v-btn>
             </td>
           </tr>
         </tbody>
       </table>
-      <span>合計 {{totalAmount}}円</span>
+      <span>総額 {{totalAmount}}円</span>
     </div>
     <div>
       <v-form ref="form" lazy-validation>
@@ -64,24 +69,55 @@
       </v-form>
     </div>
     <div>
+      <h3>精算しようー</h3>
+      <template v-if="yetItems.length>0">
+        <table>
+          <thead>
+            <th></th>
+            <th>負担した金額</th>
+            <th>精算</th>
+          </thead>
+          <tbody>
+            <tr v-for="(result, index) in paymentResult" :key="index">
+              <td>{{getUserById(result.userId).name}}</td>
+              <td>{{result.payBy}}</td>
+              <td>{{result.mustPay | formatMustPay}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <v-btn flat small color="success" @click.prevent="settleUpAll">精算した！</v-btn>
+      </template>
+      <template v-else>
+        <span>貸し借りなしだよパーフェクト！</span>
+      </template>
+    </div>
+    <div>
+      <h3>精算したよの記録</h3>
       <table>
         <thead>
-          <th></th>
-          <th>負担した金額</th>
-          <th>精算</th>
+          <tr>
+            <th>日付</th>
+            <th>モノ・コト</th>
+            <th>人</th>
+            <th>値段</th>
+            <th></th>
+          </tr>
         </thead>
         <tbody>
-          <tr v-for="(result, index) in paymentResult" :key="index">
-            <td>{{getUserById(result.userId).name}}</td>
-            <td>{{result.payBy}}</td>
-            <td>{{result.mustPay | formatMustPay}}</td>
+          <tr v-for="(item, index) in completedItems" :key="index">
+            <td>{{item.date | formatDate}}</td>
+            <td>{{item.name}}</td>
+            <td>{{getUserById(item.userId).name}}</td>
+            <td>{{item.price}}</td>
             <td>
-              <v-btn flat small color="error" @click.prevent="deleteItem(index)">☓</v-btn>
+              <v-btn flat small color="error" @click.prevent="backToYet(index)">未精算に戻す</v-btn>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+    <hr>
+    <span>debug</span>
     <pre>{{ $data }}</pre>
   </v-container>
 </template>
@@ -116,7 +152,7 @@ export default class Payment extends Vue {
       name: "尾花"
     }
   ];
-  private itemList: any[] = [
+  private yetItems: any[] = [
     {
       name: "家賃",
       userId: this.userList[0].id,
@@ -130,6 +166,14 @@ export default class Payment extends Vue {
     price: 0,
     date: new Date()
   };
+  private completedItems: any[] = [
+    {
+      name: "自転車",
+      userId: this.userList[0].id,
+      price: 500,
+      date: new Date(2019, 0, 1)
+    }
+  ];
   private rules: any = {
     required: (value: any) => !!value || "入力必須です."
   };
@@ -140,7 +184,7 @@ export default class Payment extends Vue {
   private addItem() {
     if (this.validate()) {
       const newItem = Object.assign({}, this.newItem);
-      this.itemList.push(newItem);
+      this.yetItems.push(newItem);
       (this.$refs.form as any).reset();
     }
   }
@@ -150,8 +194,22 @@ export default class Payment extends Vue {
    */
   private deleteItem(index: number) {
     if (confirm("Are you sure?")) {
-      this.itemList.splice(index, 1);
+      this.yetItems.splice(index, 1);
     }
+  }
+
+  private settleUp(index: number) {
+    this.completedItems.push(this.yetItems[index]);
+    this.yetItems.splice(index, 1);
+  }
+  private settleUpAll() {
+    if (this.yetItems.length === 0) return;
+    Array.prototype.push.apply(this.completedItems, this.yetItems);
+    this.yetItems = [];
+  }
+  private backToYet(index: number) {
+    this.yetItems.push(this.completedItems[index]);
+    this.completedItems.splice(index, 1);
   }
 
   private validate(): boolean {
@@ -171,24 +229,23 @@ export default class Payment extends Vue {
   }
 
   private get totalAmount(): number {
-    return this.priceList(this.itemList).reduce((pre, cur) => {
+    if (this.yetItems.length === 0) return 0;
+    return this.priceList(this.yetItems).reduce((pre, cur) => {
       return pre + cur;
     });
   }
 
   private get paymentResult(): any[] {
     return this.userList.map(user => {
-      const payByItemList = this.itemList.filter(item => {
+      const userItemList = this.yetItems.filter(item => {
         return item.userId === user.id;
       });
       const payBy =
-        payByItemList.length === 0
+        userItemList.length === 0
           ? 0
-          : this.priceList(payByItemList).reduce((pre, cur) => pre + cur);
-      // 切り上げ処理にしてる
-      const mustPay = Math.ceil(
-        this.totalAmount / this.userList.length - payBy
-      );
+          : this.priceList(userItemList).reduce((pre, cur) => pre + cur);
+      // 四捨五入するか迷う
+      const mustPay = this.totalAmount / this.userList.length - payBy;
 
       return { userId: user.id, payBy: payBy, mustPay: mustPay };
     });
