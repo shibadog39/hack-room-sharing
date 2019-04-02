@@ -8,7 +8,7 @@
     </v-toolbar>
 
     <v-content>
-      <Payment/>
+      <router-view/>
     </v-content>
   </v-app>
 </template>
