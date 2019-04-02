@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <v-btn small class="signout" @click="signOut">ログアウト</v-btn>
     <h1 class="display-2 font-weight-bold mb-3">永谷マンション901号室(グループ名)</h1>
     <div>
       <h3>払っといたよの記録</h3>
@@ -125,6 +126,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from "vue-property-decorator";
 import Storage from "../util/Storage";
+import firebase from "firebase";
 
 const storage = new Storage();
 
@@ -170,6 +172,15 @@ export default class Payment extends Vue {
   @Watch("completedItems", { immediate: true, deep: true })
   onCompletedItemsChanged(list: any) {
     storage.setData("completedItems", list);
+  }
+
+  signOut() {
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        this.$router.push("/signin");
+      });
   }
 
   /**
@@ -252,5 +263,8 @@ export default class Payment extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
+.signout {
+  float: right;
+}
 </style>
