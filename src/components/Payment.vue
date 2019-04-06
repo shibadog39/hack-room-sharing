@@ -123,7 +123,7 @@
   </v-container>
 </template>
 
-<script lang="ts">
+<script lang='ts'>
 import { Vue, Component, Watch } from "vue-property-decorator";
 import firebase from "firebase";
 
@@ -211,7 +211,7 @@ export default class Payment extends Vue {
   }
   private settleUpAll() {
     if (this.yetItems.length === 0) return;
-    this.yetItems.forEach(item => this.pushCompletedItem(item));
+    this.yetItems.forEach((item: any) => this.pushCompletedItem(item));
     if (this.yetItemRef) this.yetItemRef.remove();
   }
   private backToYet(index: number) {
@@ -232,7 +232,6 @@ export default class Payment extends Vue {
     return user;
   }
   private priceList(itemList: any[]): number[] {
-    console.log(itemList);
     return itemList.map(item => {
       return item.price;
     });
@@ -243,7 +242,7 @@ export default class Payment extends Vue {
     return m + "/" + d;
   }
 
-  private get yetItems() {
+  private get yetItems(): any {
     return this.yetItemFromDB ? Object.values(this.yetItemFromDB) : [];
   }
 
@@ -262,7 +261,7 @@ export default class Payment extends Vue {
 
   private get paymentResult(): any[] {
     return this.userList.map(user => {
-      const userItemList = this.yetItems.filter(item => {
+      const userItemList = this.yetItems.filter((item: any) => {
         return item.userId === user.id;
       });
       const payBy =

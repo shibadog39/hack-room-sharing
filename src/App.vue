@@ -13,7 +13,7 @@
   </v-app>
 </template>
 
-<script lang="ts">
+<script lang='ts'>
 import { Vue, Component } from "vue-property-decorator";
 import HelloWorld from "./components/HelloWorld.vue";
 import Payment from "./components/Payment.vue";
