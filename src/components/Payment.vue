@@ -25,7 +25,7 @@
               <v-btn flat small color="success" @click.prevent="settleUp(index)">個別に精算した！</v-btn>
             </td>
             <td>
-              <v-btn flat small color="error" @click.prevent="deleteItem(index)">削除</v-btn>
+              <v-btn flat small color="error" @click.prevent="deleteYetItem(index)">削除</v-btn>
             </td>
           </tr>
         </tbody>
@@ -64,7 +64,7 @@
             ></v-text-field>
           </v-flex>
           <v-flex xs3>
-            <v-btn small color="info" @click.prevent="addItem">add</v-btn>
+            <v-btn small color="info" @click.prevent="addYetItem">add</v-btn>
           </v-flex>
         </v-layout>
       </v-form>
@@ -151,8 +151,8 @@ export default class Payment extends Vue {
       name: "尾花"
     }
   ];
-  private yetItems: any = [];
-  private completedItems: any = [];
+  private yetItemFromDB: any = null;
+  private completedItemFromDB: any = null;
   private newItem: any = {
     name: "",
     userId: this.userList[0].id,
@@ -167,20 +167,11 @@ export default class Payment extends Vue {
     this.yetItemRef = firebase.database().ref("yetItem/");
     this.completedItemRef = firebase.database().ref("completedItem/");
     this.yetItemRef.on("value", snapshot => {
-      if (snapshot) this.yetItems = snapshot.val();
+      if (snapshot) this.yetItemFromDB = snapshot.val();
     });
     this.completedItemRef.on("value", snapshot => {
-      if (snapshot) this.completedItems = snapshot.val();
+      if (snapshot) this.completedItemFromDB = snapshot.val();
     });
-  }
-  @Watch("yetItems", { immediate: true, deep: true })
-  onYetItemsChanged(list: any) {
-    // yetItemRef.push(list);
-  }
-
-  @Watch("completedItems", { immediate: true, deep: true })
-  onCompletedItemsChanged(list: any) {
-    // TODO: save in firebase
   }
 
   signOut() {
@@ -193,41 +184,42 @@ export default class Payment extends Vue {
   }
 
   /**
-   * addItem
+   * addYetItem
    */
-  private addItem() {
+  private addYetItem() {
     if (this.validate()) {
       const newItem = Object.assign({}, this.newItem);
-      this.yetItems.push(newItem);
+      // firebaseに保存
+      this.pushYetItem(newItem);
       (this.$refs.form as any).reset();
     }
   }
 
   /**
-   * deleteItem
+   * deleteYetItem
    */
-  private deleteItem(index: number) {
+  private deleteYetItem(index: number) {
     if (confirm("Are you sure?")) {
-      this.yetItems.splice(index, 1);
+      // firebaseから削除
+      this.removeYetItem(index);
     }
   }
 
   private settleUp(index: number) {
-    this.completedItems.push(this.yetItems[index]);
-    this.yetItems.splice(index, 1);
+    this.pushCompletedItem(this.yetItems[index]);
+    this.removeYetItem(index);
   }
   private settleUpAll() {
     if (this.yetItems.length === 0) return;
-    Array.prototype.push.apply(this.completedItems, this.yetItems);
-    this.yetItems = [];
+    this.yetItems.forEach(item => this.pushCompletedItem(item));
+    if (this.yetItemRef) this.yetItemRef.remove();
   }
   private backToYet(index: number) {
-    this.yetItems.push(this.completedItems[index]);
-    this.completedItems.splice(index, 1);
+    this.pushYetItem(this.completedItems[index]);
+    this.removeCompletedItem(index);
   }
 
   private validate(): boolean {
-    // TODO: remove any
     return (this.$refs.form as any).validate();
   }
 
@@ -235,10 +227,12 @@ export default class Payment extends Vue {
     const user = this.userList.find(user => {
       return user.id === userId;
     });
-    if (!user) throw new Error("getUserById: Cannot find user");
+    if (!user)
+      throw new Error("getUserById: Cannot find user (ID:" + userId + ")");
     return user;
   }
   private priceList(itemList: any[]): number[] {
+    console.log(itemList);
     return itemList.map(item => {
       return item.price;
     });
@@ -247,6 +241,16 @@ export default class Payment extends Vue {
     const m = ("00" + (date.getMonth() + 1)).slice(-2);
     const d = ("00" + date.getDate()).slice(-2);
     return m + "/" + d;
+  }
+
+  private get yetItems() {
+    return this.yetItemFromDB ? Object.values(this.yetItemFromDB) : [];
+  }
+
+  private get completedItems() {
+    return this.completedItemFromDB
+      ? Object.values(this.completedItemFromDB)
+      : [];
   }
 
   private get totalAmount(): number {
@@ -270,6 +274,28 @@ export default class Payment extends Vue {
 
       return { userId: user.id, payBy: payBy, mustPay: mustPay };
     });
+  }
+
+  private pushYetItem(Item: any) {
+    if (this.yetItemRef) this.yetItemRef.push(Item);
+  }
+
+  private pushCompletedItem(Item: any) {
+    if (this.completedItemRef) this.completedItemRef.push(Item);
+  }
+
+  private removeYetItem(index: number) {
+    firebase
+      .database()
+      .ref("yetItem/" + Object.keys(this.yetItemFromDB)[index])
+      .remove();
+  }
+
+  private removeCompletedItem(index: number) {
+    firebase
+      .database()
+      .ref("completedItem/" + Object.keys(this.completedItemFromDB)[index])
+      .remove();
   }
 }
 </script>
