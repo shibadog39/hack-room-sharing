@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-btn small class="signout" @click="signOut">ログアウト</v-btn>
-    <h1 class="display-2 font-weight-bold mb-3">永谷マンション901号室(グループ名)</h1>
+    <h2 class="font-weight-bold mb-3">永谷マンション901号室</h2>
     <div>
       <h3>払っといたよの記録</h3>
       <table>
@@ -11,8 +11,6 @@
             <th>モノ・コト</th>
             <th>人</th>
             <th>値段</th>
-            <th></th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -22,7 +20,7 @@
             <td>{{getUserById(item.userId).name}}</td>
             <td>{{item.price}}</td>
             <td>
-              <v-btn flat small color="success" @click.prevent="settleUp(index)">個別に精算した！</v-btn>
+              <v-btn flat small color="success" @click.prevent="settleUp(index)">精算</v-btn>
             </td>
             <td>
               <v-btn flat small color="error" @click.prevent="deleteYetItem(index)">削除</v-btn>
@@ -101,7 +99,6 @@
             <th>モノ・コト</th>
             <th>人</th>
             <th>値段</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -119,7 +116,7 @@
     </div>
     <hr>
     <!-- <span>debug</span>
-    <pre>{{ $data }}</pre> -->
+    <pre>{{ $data }}</pre>-->
   </v-container>
 </template>
 
@@ -302,5 +299,27 @@ export default class Payment extends Vue {
 <style scoped>
 .signout {
   float: right;
+}
+
+.table {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 2rem;
+  background-color: #fff;
+}
+
+thead,
+tbody,
+thead,
+tr,
+th {
+  width: auto;
+  font-weight: 400;
+  color: #080808;
+  vertical-align: bottom;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+td {
+  text-align: center;
 }
 </style>
