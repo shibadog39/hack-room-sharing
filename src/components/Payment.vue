@@ -118,8 +118,8 @@
       </table>
     </div>
     <hr>
-    <span>debug</span>
-    <pre>{{ $data }}</pre>
+    <!-- <span>debug</span>
+    <pre>{{ $data }}</pre> -->
   </v-container>
 </template>
 
