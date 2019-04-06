@@ -1,30 +1,30 @@
-import Vue from "vue";
-import Router from "vue-router";
-import Signup from "./components/Signup.vue";
-import Signin from "./components/Signin.vue";
-import Payment from "./components/Payment.vue";
-import firebase from "firebase";
+import Vue from 'vue';
+import Router from 'vue-router';
+// import Signup from './components/Signup.vue';
+import Signin from './components/Signin.vue';
+import Payment from './components/Payment.vue';
+import firebase from 'firebase';
 
 Vue.use(Router);
 
 const router = new Router({
-  mode: "history",
+  mode: 'history',
   base: process.env.BASE_URL,
   routes: [
     {
-      path: "/",
-      name: "Payment",
+      path: '/',
+      name: 'Payment',
       component: Payment,
       meta: { requiresAuth: true }
     },
+    // {
+    //   path: "/signup",
+    //   name: "Signup",
+    //   component: Signup
+    // },
     {
-      path: "/signup",
-      name: "Signup",
-      component: Signup
-    },
-    {
-      path: "/signin",
-      name: "Signin",
+      path: '/signin',
+      name: 'Signin',
       component: Signin
     }
   ]
@@ -40,7 +40,7 @@ router.beforeEach((to, from, next) => {
         next();
       } else {
         next({
-          path: "/signin",
+          path: '/signin',
           query: { redirect: to.fullPath }
         });
       }

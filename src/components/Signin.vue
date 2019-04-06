@@ -4,9 +4,9 @@
     <input type="text" placeholder="Username" v-model="username">
     <input type="password" placeholder="Password" v-model="password">
     <button @click="signIn">Signin</button>
-    <p>You don't have an account?
+    <!-- <p>You don't have an account?
       <router-link to="/signup">create account now!!</router-link>
-    </p>
+    </p>-->
   </div>
 </template>
 
@@ -28,7 +28,6 @@ export default {
         .signInWithEmailAndPassword(this.username, this.password)
         .then(
           user => {
-            alert("Success!");
             this.$router.push("/");
           },
           err => {
