@@ -114,7 +114,7 @@
         </tbody>
       </table>
     </div>
-    <hr>
+    <!-- <hr> -->
     <!-- <span>debug</span>
     <pre>{{ $data }}</pre>-->
   </v-container>
