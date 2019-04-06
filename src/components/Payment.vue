@@ -125,10 +125,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from "vue-property-decorator";
-import Storage from "../util/Storage";
 import firebase from "firebase";
-
-const storage = new Storage();
 
 @Component({
   filters: {
@@ -142,6 +139,8 @@ const storage = new Storage();
   }
 })
 export default class Payment extends Vue {
+  private yetItemRef: firebase.database.Reference | null = null;
+  private completedItemRef: firebase.database.Reference | null = null;
   private userList: any[] = [
     {
       id: 1,
@@ -152,26 +151,36 @@ export default class Payment extends Vue {
       name: "尾花"
     }
   ];
-  private yetItems: any[] = storage.getData("yetItems") || [];
+  private yetItems: any = [];
+  private completedItems: any = [];
   private newItem: any = {
     name: "",
     userId: this.userList[0].id,
     price: 0,
     date: this.formatDate(new Date())
   };
-  private completedItems: any[] = storage.getData("completedItems") || [];
   private rules: any = {
     required: (value: any) => !!value || "入力必須です."
   };
 
+  created() {
+    this.yetItemRef = firebase.database().ref("yetItem/");
+    this.completedItemRef = firebase.database().ref("completedItem/");
+    this.yetItemRef.on("value", snapshot => {
+      if (snapshot) this.yetItems = snapshot.val();
+    });
+    this.completedItemRef.on("value", snapshot => {
+      if (snapshot) this.completedItems = snapshot.val();
+    });
+  }
   @Watch("yetItems", { immediate: true, deep: true })
   onYetItemsChanged(list: any) {
-    storage.setData("yetItems", list);
+    // yetItemRef.push(list);
   }
 
   @Watch("completedItems", { immediate: true, deep: true })
   onCompletedItemsChanged(list: any) {
-    storage.setData("completedItems", list);
+    // TODO: save in firebase
   }
 
   signOut() {
@@ -223,9 +232,11 @@ export default class Payment extends Vue {
   }
 
   private getUserById(userId: number): object {
-    return this.userList.find(user => {
+    const user = this.userList.find(user => {
       return user.id === userId;
     });
+    if (!user) throw new Error("getUserById: Cannot find user");
+    return user;
   }
   private priceList(itemList: any[]): number[] {
     return itemList.map(item => {
