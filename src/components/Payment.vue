@@ -102,7 +102,7 @@
             </tr>
           </tbody>
         </table>
-        <v-btn flat small color="success" @click.prevent="settleUpAll">全部精算した！</v-btn>
+        <v-btn outline small color="success" @click.prevent="settleUpAll">全部精算した！</v-btn>
       </template>
       <template v-else>
         <span>貸し借りなし!</span>
@@ -173,8 +173,6 @@ export default class Payment extends Vue {
       name: "尾花"
     }
   ];
-  private yetItemFromDB: any = null;
-  private completedItemFromDB: any = null;
   private newItem: any = {
     name: "",
     userId: this.userList[0].id,
@@ -189,10 +187,11 @@ export default class Payment extends Vue {
     this.yetItemRef = firebase.database().ref("yetItem/");
     this.completedItemRef = firebase.database().ref("completedItem/");
     this.yetItemRef.on("value", snapshot => {
-      if (snapshot) this.yetItemFromDB = snapshot.val();
+      if (snapshot) this.$store.commit("updateYetItemFromDB", snapshot.val());
     });
     this.completedItemRef.on("value", snapshot => {
-      if (snapshot) this.completedItemFromDB = snapshot.val();
+      if (snapshot)
+        this.$store.commit("updateCompletedItemFromDB", snapshot.val());
     });
   }
 
@@ -262,6 +261,14 @@ export default class Payment extends Vue {
     const m = ("00" + (date.getMonth() + 1)).slice(-2);
     const d = ("00" + date.getDate()).slice(-2);
     return m + "/" + d;
+  }
+
+  private get yetItemFromDB(): any {
+    return this.$store.state.yetItemFromDB;
+  }
+
+  private get completedItemFromDB(): any {
+    return this.$store.state.completedItemFromDB;
   }
 
   private get yetItems(): any {
