@@ -3,6 +3,7 @@ import Router from 'vue-router';
 // import Signup from './components/Signup.vue';
 import Signin from './components/Signin.vue';
 import Payment from './components/Payment.vue';
+import History from './components/History.vue';
 import firebase from 'firebase';
 
 Vue.use(Router);
@@ -15,6 +16,12 @@ const router = new Router({
       path: '/',
       name: 'Payment',
       component: Payment,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/history',
+      name: 'History',
+      component: History,
       meta: { requiresAuth: true }
     },
     // {

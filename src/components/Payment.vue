@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <router-link to="/history">履歴</router-link>
     <v-btn small class="signout" @click="signOut">ログアウト</v-btn>
     <h2 class="font-weight-bold mb-3">永谷マンション901号室</h2>
     <div>
@@ -108,37 +109,6 @@
         <span>貸し借りなし!</span>
       </template>
     </div>
-    <div>
-      <h3>精算したよの記録</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>日付</th>
-            <th>モノ</th>
-            <th>人</th>
-            <th>値段</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in completedItems" :key="index">
-            <td>{{item.date}}</td>
-            <td>{{item.name}}</td>
-            <td>{{getUserById(item.userId).name}}</td>
-            <td>{{item.price}}</td>
-            <td>
-              <v-btn
-                flat
-                fab
-                small
-                color="error"
-                class="table-btn"
-                @click.prevent="backToYet(index)"
-              >戻す</v-btn>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
     <!-- <hr> -->
     <!-- <span>debug</span>
     <pre>{{ $data }}</pre>-->
@@ -234,10 +204,6 @@ export default class Payment extends Vue {
     if (this.yetItems.length === 0) return;
     this.yetItems.forEach((item: any) => this.pushCompletedItem(item));
     if (this.yetItemRef) this.yetItemRef.remove();
-  }
-  private backToYet(index: number) {
-    this.pushYetItem(this.completedItems[index]);
-    this.removeCompletedItem(index);
   }
 
   private validate(): boolean {

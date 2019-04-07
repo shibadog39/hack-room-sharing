@@ -6,7 +6,6 @@
       </v-toolbar-title>
       <v-spacer></v-spacer>
     </v-toolbar>
-
     <v-content>
       <router-view/>
     </v-content>
@@ -17,11 +16,13 @@
 import { Vue, Component } from "vue-property-decorator";
 import HelloWorld from "./components/HelloWorld.vue";
 import Payment from "./components/Payment.vue";
+import History from "./components/History.vue";
 
 @Component({
   components: {
     HelloWorld,
-    Payment
+    Payment,
+    History
   }
 })
 export default class App extends Vue {}
