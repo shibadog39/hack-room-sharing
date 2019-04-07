@@ -4,33 +4,51 @@
     <h2 class="font-weight-bold mb-3">永谷マンション901号室</h2>
     <div>
       <h3>払っといたよの記録</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>日付</th>
-            <th>モノ・コト</th>
-            <th>人</th>
-            <th>値段</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in yetItems" :key="index">
-            <td>{{item.date}}</td>
-            <td>{{item.name}}</td>
-            <td>{{getUserById(item.userId).name}}</td>
-            <td>{{item.price}}</td>
-            <td>
-              <v-btn flat small color="success" @click.prevent="settleUp(index)">精算</v-btn>
-            </td>
-            <td>
-              <v-btn flat small color="error" @click.prevent="deleteYetItem(index)">削除</v-btn>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <span>総額 {{totalAmount}}円</span>
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>日付</th>
+              <th>モノ</th>
+              <th>人</th>
+              <th>値段</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in yetItems" :key="index">
+              <td>{{item.date}}</td>
+              <td>{{item.name}}</td>
+              <td>{{getUserById(item.userId).name}}</td>
+              <td>{{item.price}}</td>
+              <td>
+                <v-btn
+                  flat
+                  fab
+                  small
+                  class="table-btn"
+                  color="success"
+                  @click.prevent="settleUp(index)"
+                >精算</v-btn>
+              </td>
+              <td>
+                <v-btn
+                  flat
+                  fab
+                  small
+                  class="table-btn"
+                  color="error"
+                  @click.prevent="deleteYetItem(index)"
+                >削除</v-btn>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="totalAmount">
+        <span>合計 {{totalAmount}}円</span>
+      </div>
     </div>
-    <div>
+    <div class="form">
       <v-form ref="form" lazy-validation>
         <v-layout row wrap>
           <v-flex xs3>
@@ -45,9 +63,9 @@
           </v-flex>
           <v-flex xs3>
             <v-text-field
-              label="モノ・コト"
+              label="モノ"
               type="text"
-              placeholder="ティッシュ"
+              placeholder="家賃"
               v-model="newItem.name"
               :rules="[rules.required]"
             ></v-text-field>
@@ -62,7 +80,7 @@
             ></v-text-field>
           </v-flex>
           <v-flex xs3>
-            <v-btn small color="info" @click.prevent="addYetItem">add</v-btn>
+            <v-btn small fab color="info" @click.prevent="addYetItem">追加</v-btn>
           </v-flex>
         </v-layout>
       </v-form>
@@ -87,7 +105,7 @@
         <v-btn flat small color="success" @click.prevent="settleUpAll">全部精算した！</v-btn>
       </template>
       <template v-else>
-        <span>貸し借りなしだよパーフェクト！</span>
+        <span>貸し借りなし!</span>
       </template>
     </div>
     <div>
@@ -96,7 +114,7 @@
         <thead>
           <tr>
             <th>日付</th>
-            <th>モノ・コト</th>
+            <th>モノ</th>
             <th>人</th>
             <th>値段</th>
           </tr>
@@ -108,7 +126,14 @@
             <td>{{getUserById(item.userId).name}}</td>
             <td>{{item.price}}</td>
             <td>
-              <v-btn flat small color="error" @click.prevent="backToYet(index)">未精算に戻す</v-btn>
+              <v-btn
+                flat
+                fab
+                small
+                color="error"
+                class="table-btn"
+                @click.prevent="backToYet(index)"
+              >戻す</v-btn>
             </td>
           </tr>
         </tbody>
@@ -321,5 +346,18 @@ th {
 }
 td {
   text-align: center;
+}
+
+.table-btn {
+  width: 15px;
+  height: 15px;
+}
+
+.form {
+  padding-top: 10px;
+}
+
+.totalAmount {
+  padding-top: 10px;
 }
 </style>
